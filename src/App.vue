@@ -13,5 +13,8 @@
 </script>
 
 <style>
-	/*每个页面公共css */
+@import "/static/iconfont.css";  
+body{
+	font-size: 14px;
+}
 </style>

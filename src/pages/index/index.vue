@@ -1,49 +1,68 @@
-<template>
-	<view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<view>
-			<text class="title">{{title}}</text>
-		</view>
-	</view>
+<template lang="pug">
+  .home-page
+    article-item(
+      v-for="(item, index) in data" 
+      :key="item.id" 
+      :article="item"
+      :index="index"
+      @click.native="goTo(item.id)"
+    )
+    uni-load-more(:status="status" v-if="!isInit")
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				title: 'Hello'
-			}
-		},
-		onLoad() {
+import { mapState, mapActions, mapGetters } from 'vuex';
 
-		},
-		methods: {
+export default {
+  data(){
+    return{
+      isInit: true,
+      isLoading: false,
+    }
+  },
 
-		}
-	}
+  computed: {
+    ...mapState('articles', ['data']),
+    ...mapGetters('articles', ['hasMore']),
+
+    status(){
+      if(!this.hasMore){
+        return 'nomore'
+      }
+      return this.isLoading ? 'loading' : 'more';
+    }
+  },
+
+  methods: {
+    ...mapActions('articles', ['fetchData']),
+
+    goTo(id){
+      uni.navigateTo({
+        url: `/pages/article/article?id=${id}`
+      })
+    }
+  },  
+
+  async onLoad() {
+    uni.showLoading({
+      title: '加载中'
+    });
+    this.isInit = true;
+    await this.fetchData();
+    uni.hideLoading();
+    this.isInit = false;
+  },
+
+  async onReachBottom(e){
+    if(this.hasMore){
+      this.isLoading = true;
+      await this.fetchData();
+      this.isLoading = false;
+    }
+  }
+}
 </script>
 
-<style>
-	.content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.logo {
-		height: 200rpx;
-		width: 200rpx;
-		margin: 200rpx auto 50rpx auto;
-	}
-
-	.text-area {
-		display: flex;
-		justify-content: center;
-	}
-
-	.title {
-		font-size: 36rpx;
-		color: #8f8f94;
-	}
+<style lang="scss">
+.home-page {}  
 </style>
