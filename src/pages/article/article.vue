@@ -1,7 +1,7 @@
 <template lang="pug">
   .article-show(v-if="!isLoading")
     uni-title(type='h1' :title="data.title")
-    .menu-btn(@click="switchMenu")
+    .menu-btn(@click="showDrawer")
       span.iconfont.fi-menu
     .author
       cmd-avatar.avatar(
@@ -31,10 +31,12 @@
           | {{data.meta.like}}
 
     uni-drawer(
-      :visible="menuVisible"
+      ref="showRight"
+      mode="right" 
     )
-      .test
-        b test
+      scroll-view.scroll-view-box(scroll-y="true")
+        view(v-for="item in data.menu" :key="item.data.id")
+          | {{ item.value }}
 
 </template>
 
@@ -69,8 +71,11 @@ export default {
   methods: {
     ...mapActions('article', ['fetchData']),
 
-    switchMenu(){
-      this.menuVisible = true;
+    showDrawer() {
+      this.$refs.showRight.open();
+    },
+    closeDrawer() {
+      this.$refs.showRight.close();
     }
   },
 
@@ -154,6 +159,10 @@ export default {
   .content{
     font-size: 18px;
     white-space: break-spaces;
+  }
+
+  .scroll-view-box{
+    height: 100vh;
   }
 }
 </style>
