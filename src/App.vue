@@ -12,8 +12,11 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
 @import "/static/iconfont.css";  
+@import "@/common/styles/markdown.scss";
+@import "@/common/styles/a11y-dark.css";
+
 body{
 	font-size: 14px;
 }

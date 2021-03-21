@@ -15,7 +15,7 @@ export default {
       state.count = Number(data.count);
       state.page = Number(data.page);
       state.quantity = Number(data.quantity);
-    }
+    },
   },
 
   getters: {

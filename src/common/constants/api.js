@@ -1,5 +1,6 @@
 export default {
   API_URL: 'https://api.mmisme.cn',
+  // API_URL: 'http://localhost:3000',
   ARTICLE_LIST: '/articles',
   ARTICLE_SHOW: '/articles/:id',
   ARTICLE_CREATE: '/articles',
