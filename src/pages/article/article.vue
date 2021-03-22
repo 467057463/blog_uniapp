@@ -106,10 +106,10 @@ export default {
     top: 65px;
     right: 0px;
     width: 40px;
-    height: 30px;
+    height: 40px;
     background: #eee;
-    border-top-left-radius: 15px;
-    border-bottom-left-radius: 15px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
