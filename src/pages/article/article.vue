@@ -22,7 +22,6 @@
       rich-text(
         :nodes="content"
       )
-      //- MDParserHighlight(resource="### hello world")
 
     .meta
       .meta-data
@@ -32,22 +31,25 @@
 
     uni-drawer(
       ref="showRight"
-      mode="right" 
+      mode="right"
+      :width="280"
     )
-      scroll-view.scroll-view-box(scroll-y="true")
-        view(v-for="item in data.menu" :key="item.data.id")
-          | {{ item.value }}
+      .title 文章标题
+      scroll-view.scroll-view-box(scroll-y="true")        
+        m-menu(
+          :menu="data.menu"
+          @scrollTo="goTo"
+        )
+        //- view(v-for="item in data.menu" :key="item.data.id")
+        //-   | {{ item.value }}
 
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex';
-// import MDParserHighlight from '../../components/cmder-MDParserHighlight/index.vue';
+
 
 export default {
-  // components: {
-  //   MDParserHighlight
-  // },
 
   data() {
     return {
@@ -63,6 +65,7 @@ export default {
       if(this.data.contentHtml){
         return this.data.contentHtml
           .replace(/<([a-z0-9]+\b)>/g, "<$1 class='m_$1'>")
+          .replace(/id/g, 'class')
           .replace(/<(h[1-6])\b/g, "<$1 class='m_$1' ")
       }
     }
@@ -76,7 +79,17 @@ export default {
     },
     closeDrawer() {
       this.$refs.showRight.close();
-    }
+    },
+
+    goTo(selector){
+      uni.createSelectorQuery().in(this).select(`.map-构造函数`).boundingClientRect().exec((res) => {
+        console.log(res, this.pageTop)
+        uni.pageScrollTo({
+          scrollTop: res[0].top,
+          duration: 300
+        });
+      })
+    }, 
   },
 
   async onLoad(options) {
@@ -90,6 +103,9 @@ export default {
     })
     this.isLoading = false;
     uni.hideLoading();
+    // setTimeout(() =>{
+    //   this.goTo()
+    // }, 300)
   },
 
 }
@@ -103,7 +119,7 @@ export default {
   .menu-btn{
     position: fixed;
     z-index: 2;
-    top: 65px;
+    top: 60px;
     right: 0px;
     width: 40px;
     height: 40px;
@@ -114,7 +130,7 @@ export default {
     justify-content: center;
     align-items: center;
     .fi-menu{
-      font-size: 18px;
+      font-size: 20px;
     }
   }
 
@@ -161,8 +177,15 @@ export default {
     white-space: break-spaces;
   }
 
+  .title{
+    position: relative;
+    padding: 16px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    border-radius: 2px 2px 0 0;
+  }
   .scroll-view-box{
     height: 100vh;
+    padding: 15px;
   }
 }
 </style>

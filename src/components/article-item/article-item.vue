@@ -31,6 +31,8 @@ import exart05 from '@/images/exart_05.jpg';
 const images = [exart01, exart02, exart03, exart04, exart05]
 
 export default {
+  name: 'article-item',
+  
   props: {
     article: {
       type: Object
