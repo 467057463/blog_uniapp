@@ -2,10 +2,15 @@
   .m-menu
     .ul
       .li(v-for="item in menu" :key="item.data.id")
-        .span(@click="getSelect(item.data.id)") {{item.value}}
+        .span(
+          @click="getSelect(item.data.id)"
+          :class="{active: active === item.data.id}"
+        ) {{item.value}}
         m-menu(
           v-if="item.children && item.children.length > 0" 
           :menu="item.children"
+          @scrollTo="getSelect"
+          :active="active"
         )
 </template>
 
@@ -19,42 +24,17 @@ export default {
       default: function(){
         return []
       }
-    }
+    },
+    active: String
   },
 
   methods: {
-    goTo(selector){
-      console.log(selector)
-      const query = uni.createSelectorQuery().in(this);
-      query.select('.map-构造函数').boundingClientRect().exec((res) => {
-        console.log(res)
-        if(res[0]){
-          uni.pageScrollTo({
-            scrollTop: res[0].top,
-            duration: 300
-          });
-        }else{
-          // this.$nextTick(() => {
-          //   this.goTo(selector)
-          // })
-        }
-      });
-      // console.log(selector)
-      // uni.pageScrollTo({
-      //   // scrollTop: 0,
-      //   selector: `.${selector}`,
-      //   duration: 300
-      // });
-    },
-
-    getSelect(){
-      this.$emit('scrollTo')
+    getSelect(selector){
+      this.$emit('scrollTo', selector)
     }
   },
 
-  // onReady(){
-  //   this.goTo()
-  // },
+
 }
 </script>
 
@@ -62,12 +42,16 @@ export default {
 .m-menu{
   font-size: 14px;
   .span{
-    // height: 35px;
-    padding: 8px 0;
+    padding: 6px 0;
     padding-right: 20px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow:ellipsis;
+    // color: #808080;
+  }
+  .span.active{
+    // color: red;
+    font-weight: bolder;
   }
   .ul{
     padding-left: 1em;

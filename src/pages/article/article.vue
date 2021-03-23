@@ -19,8 +19,10 @@
             | {{data.meta.view}}
           
     .markdown-body
-      rich-text(
-        :nodes="content"
+      mp-html(
+        ref="article"
+        :content="content"
+        use-anchor
       )
 
     .meta
@@ -32,29 +34,34 @@
     uni-drawer(
       ref="showRight"
       mode="right"
-      :width="280"
-    )
-      .title 文章标题
+      :width="260"
+    ).drawer-box
       scroll-view.scroll-view-box(scroll-y="true")        
-        m-menu(
+        .title 文章标题
+        m-menu.menu(
           :menu="data.menu"
           @scrollTo="goTo"
+          :active="active"
         )
-        //- view(v-for="item in data.menu" :key="item.data.id")
-        //-   | {{ item.value }}
+
 
 </template>
 
 <script>
+import mpHtml from 'mp-html/dist/uni-app/components/mp-html/mp-html'
 import { mapState, mapActions } from 'vuex';
 
-
+let observer = null;
 export default {
-
+  components: {
+    mpHtml
+  },
   data() {
     return {
       isLoading: false,
-      menuVisible: false
+      menuVisible: false,
+      active: '',
+      observer: null
     }
   },
 
@@ -65,9 +72,24 @@ export default {
       if(this.data.contentHtml){
         return this.data.contentHtml
           .replace(/<([a-z0-9]+\b)>/g, "<$1 class='m_$1'>")
-          .replace(/id/g, 'class')
-          .replace(/<(h[1-6])\b/g, "<$1 class='m_$1' ")
+          .replace(/<(h[1-6])\b/g, "<$1 class='m_$1 header'")
       }
+    },
+
+    headers(){
+      if(this.data.menu){
+        const res = [];
+        (function walk(menu){
+          menu.forEach(item => {
+            res.push(item.data.id)
+            if(item.children && item.children.length){
+              walk(item.children)
+            }
+          });
+        })(this.data.menu)
+        return res;
+      }
+      return []
     }
   },
 
@@ -82,14 +104,29 @@ export default {
     },
 
     goTo(selector){
-      uni.createSelectorQuery().in(this).select(`.map-构造函数`).boundingClientRect().exec((res) => {
-        console.log(res, this.pageTop)
-        uni.pageScrollTo({
-          scrollTop: res[0].top,
-          duration: 300
-        });
+      var ctx = this.$refs.article;  
+      ctx.navigateTo(selector).then(() => {
+        console.log('跳转成功')
+      }).catch(err => {
+        console.log('跳转失败：', err)
       })
-    }, 
+    },
+
+    observerHeader(){
+      this.observer = uni.createIntersectionObserver(this);
+      this.headers.forEach(item => {
+        this.observer
+        .relativeToViewport({
+          bottom: -480
+        })
+        .observe(`#${item}`, (res) => {
+          console.log(res)
+          if(res.intersectionRatio > 0){
+            this.active = res.id
+          }
+        })
+      })      
+    }
   },
 
   async onLoad(options) {
@@ -103,11 +140,14 @@ export default {
     })
     this.isLoading = false;
     uni.hideLoading();
-    // setTimeout(() =>{
-    //   this.goTo()
-    // }, 300)
+    setTimeout(() => {
+      this.observerHeader()
+    }, 300)
   },
 
+  onUnload(){
+    this.observer.disconnect()
+  }
 }
 </script>
 
@@ -177,15 +217,21 @@ export default {
     white-space: break-spaces;
   }
 
+  .drawer-box{
+    display: flex;
+    flex-direction: column;
+  }
   .title{
     position: relative;
-    padding: 16px 15px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 0;
     border-radius: 2px 2px 0 0;
+    font-weight: bolder;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
   }
   .scroll-view-box{
     height: 100vh;
-    padding: 15px;
+    padding: 0 15px 10px;
   }
 }
 </style>
